@@ -13,8 +13,7 @@ namespace brepdb
 
 Region::Region()
 {
-	memset(m_low, 0, DIMENSION * sizeof(double));
-	memset(m_high, 0, DIMENSION * sizeof(double));
+	MakeInfinite();
 }
 
 Region::Region(const double* low, const double* high)
@@ -327,7 +326,6 @@ double Region::GetMinimumDistance(const Point& p) const
 Region Region::GetIntersectingRegion(const Region& r) const
 {
 	Region ret;
-	ret.MakeInfinite();
 
 	// check for intersection.
 	// marioh: avoid function call since this is called billions of times.

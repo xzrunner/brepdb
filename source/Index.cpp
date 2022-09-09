@@ -45,10 +45,7 @@ std::shared_ptr<Node> Index::ChooseSubtree(const Region& mbr, uint32_t level, st
 	assert(child != std::numeric_limits<uint32_t>::max());
 
 	std::shared_ptr<Node> n = m_tree->ReadNode(m_children_id[child]);
-	std::shared_ptr<Node> ret = n->ChooseSubtree(mbr, level, path_buf);
-	assert(n.unique());
-
-	return ret;
+	return n->ChooseSubtree(mbr, level, path_buf);
 }
 
 std::shared_ptr<Node> Index::FindLeaf(const Region& mbr, id_type id, std::stack<id_type>& path_buf)
@@ -93,9 +90,6 @@ void Index::Split(uint32_t data_len, uint8_t* data, const Region& mbr, id_type i
 
 	auto l = std::make_shared<Index>(m_tree, m_identifier, m_level);
 	auto r = std::make_shared<Index>(m_tree, -1, m_level);
-
-	l->m_node_mbr.MakeInfinite();
-	r->m_node_mbr.MakeInfinite();
 
 	uint32_t c_idx;
 	for (c_idx = 0; c_idx < g1.size(); ++c_idx) {

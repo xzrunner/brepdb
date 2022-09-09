@@ -125,6 +125,7 @@ class ISpatialIndex
 public:
 	virtual void InsertData(uint32_t len, const uint8_t* data, const IShape& shape, id_type shape_id) = 0;
 	virtual bool DeleteData(const IShape& shape, id_type shape_id) = 0;
+	virtual void LevelTraversal(IVisitor& v) = 0;
 	virtual void InternalNodesQuery(const IShape& query, IVisitor& v) = 0;
 	virtual void ContainsWhatQuery(const IShape& query, IVisitor& v)  = 0;
 	virtual void IntersectsWithQuery(const IShape& query, IVisitor& v) = 0;

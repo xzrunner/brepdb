@@ -2,6 +2,7 @@
 #include "brepdb/Index.h"
 #include "brepdb/RTree.h"
 #include "brepdb/Exception.h"
+#include "brepdb/Point.h"
 
 #include <exception>
 #include <string>
@@ -108,8 +109,6 @@ Node::Node(RTree* tree, id_type id, uint32_t level, uint32_t capacity)
 	, m_identifier(id)
 	, m_capacity(capacity)
 {
-	m_node_mbr.MakeInfinite();
-
 	try
 	{
 		m_children_id       = new id_type[m_capacity + 1];
@@ -303,12 +302,12 @@ uint32_t Node::GetLevel() const
 
 bool Node::IsIndex() const
 {
-	return m_level == 0;
+	return m_level != 0;
 }
 
 bool Node::IsLeaf() const
 {
-	return m_level != 0;
+	return m_level == 0;
 }
 
 void Node::InsertEntry(uint32_t data_len, uint8_t* data, const Region& mbr, id_type id)
@@ -533,7 +532,62 @@ bool Node::InsertData(uint32_t data_len, uint8_t* data, const Region& mbr, id_ty
 
 void Node::ReinsertData(uint32_t data_len, uint8_t* data, const Region& mbr, id_type id, std::vector<uint32_t>& reinsert, std::vector<uint32_t>& keep)
 {
+	ReinsertEntry** v = new ReinsertEntry*[m_capacity + 1];
 
+	m_children_data_len[m_children] = data_len;
+	m_children_data[m_children] = data;
+	m_children_mbr[m_children] = mbr;
+	m_children_id[m_children] = id;
+
+	Point nc;
+	m_node_mbr.GetCenter(nc);
+	for (int i = 0; i < m_capacity + 1; ++i)
+	{
+		try
+		{
+			v[i] = new ReinsertEntry(i, 0.0);
+		}
+		catch (...)
+		{
+			for (uint32_t i = 0; i < i; ++i) delete v[i];
+			delete[] v;
+			throw;
+		}
+
+		Point c;
+		m_children_mbr[i].GetCenter(c);
+
+		// calculate relative distance of every entry from the node MBR (ignore square root.)
+		for (int j = 0; j < DIMENSION; ++j)
+		{
+			double d = nc.GetCoords()[j] - c.GetCoords()[j];
+			v[i]->m_dist += d * d;
+		}
+	}
+
+	// sort by increasing order of distances.
+	::qsort(v, m_capacity + 1, sizeof(ReinsertEntry*), ReinsertEntry::CompareReinsertEntry);
+
+	uint32_t c_reinsert = static_cast<uint32_t>(std::floor((m_capacity + 1) * m_tree->m_reinsert_factor));
+	for (int i = 0; i < m_capacity + 1; ++i)
+	{
+		if (i < m_capacity + 1 - c_reinsert)
+		{
+			// Keep all but cReinsert nodes
+			keep.push_back(v[i]->m_index);
+		}
+		else
+		{
+			// Remove cReinsert nodes which will be
+			// reinserted into the tree. Since our array
+			// is already sorted in ascending order this
+			// matches the order suggested in the paper.
+			reinsert.push_back(v[i]->m_index);
+		}
+		delete v[i];
+	}
+
+	delete[] v;
 }
 
 void Node::RTreeSplit(uint32_t data_len, uint8_t* data, const Region& mbr, id_type id, std::vector<uint32_t>& group1, std::vector<uint32_t>& group2)
@@ -770,7 +824,7 @@ void Node::RStarSplit(uint32_t data_len, uint8_t* data, const Region& mbr, id_ty
 
 			marginl += bbl1.GetMargin() + bbl2.GetMargin();
 			marginh += bbh1.GetMargin() + bbh2.GetMargin();
-		} // for (u32Child)
+		}
 
 		double margin = std::min(marginl, marginh);
 
@@ -838,7 +892,7 @@ void Node::RStarSplit(uint32_t data_len, uint8_t* data, const Region& mbr, id_ty
 				ma = a;
 			}
 		}
-	} // for (u32Child)
+	}
 
 	uint32_t l1 = node_spf - 1 + split_point;
 

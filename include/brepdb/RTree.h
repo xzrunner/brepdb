@@ -12,26 +12,28 @@ class Node;
 class RTree : public ISpatialIndex
 {
 public:
-	RTree(const std::shared_ptr<IStorageManager>& sm);
+	RTree(const std::shared_ptr<IStorageManager>& sm, bool overwrite);
+	virtual ~RTree();
 
 	//
 	// ISpatialIndex interface
 	//
-	virtual void InsertData(uint32_t len, const uint8_t* data, const IShape& shape, id_type shape_id);
-	virtual bool DeleteData(const IShape& shape, id_type shape_id);
-	virtual void InternalNodesQuery(const IShape& query, IVisitor& v);
-	virtual void ContainsWhatQuery(const IShape& query, IVisitor& v);
-	virtual void IntersectsWithQuery(const IShape& query, IVisitor& v);
-	virtual void PointLocationQuery(const Point& query, IVisitor& v);
-	virtual void NearestNeighborQuery(uint32_t k, const IShape& query, IVisitor& v, INearestNeighborComparator& nnc);
-	virtual void NearestNeighborQuery(uint32_t k, const IShape& query, IVisitor& v);
-	virtual void SelfJoinQuery(const IShape& s, IVisitor& v);
-	virtual void QueryStrategy(IQueryStrategy& qs);
-	//virtual void GetIndexProperties(PropertySet& out) const;
-	//virtual void AddCommand(ICommand* in, CommandType ct);
-	virtual bool IsIndexValid();
-	//virtual void GetStatistics(IStatistics** out) const;
-	virtual void Flush();
+	virtual void InsertData(uint32_t len, const uint8_t* data, const IShape& shape, id_type shape_id) override;
+	virtual bool DeleteData(const IShape& shape, id_type shape_id) override;
+	virtual void LevelTraversal(IVisitor& v) override;
+	virtual void InternalNodesQuery(const IShape& query, IVisitor& v) override;
+	virtual void ContainsWhatQuery(const IShape& query, IVisitor& v) override;
+	virtual void IntersectsWithQuery(const IShape& query, IVisitor& v) override;
+	virtual void PointLocationQuery(const Point& query, IVisitor& v) override;
+	virtual void NearestNeighborQuery(uint32_t k, const IShape& query, IVisitor& v, INearestNeighborComparator& nnc) override;
+	virtual void NearestNeighborQuery(uint32_t k, const IShape& query, IVisitor& v) override;
+	virtual void SelfJoinQuery(const IShape& s, IVisitor& v) override;
+	virtual void QueryStrategy(IQueryStrategy& qs) override;
+	//virtual void GetIndexProperties(PropertySet& out) const override;
+	//virtual void AddCommand(ICommand* in, CommandType ct) override;
+	virtual bool IsIndexValid() override;
+	//virtual void GetStatistics(IStatistics** out) const override;
+	virtual void Flush() override;
 
 	id_type WriteNode(const Node& n);
 	std::shared_ptr<Node> ReadNode(id_type page);
@@ -39,6 +41,9 @@ public:
 
 private:
 	void InitNew();
+	void InitOld();
+	void StoreHeader();
+	void LoadHeader();
 
 	void insertData_impl(uint32_t data_len, uint8_t* data, Region& mbr, id_type id);
 	void insertData_impl(uint32_t data_len, uint8_t* data, Region& mbr, id_type id, uint32_t level, uint8_t* overflow_tbl);
@@ -51,16 +56,16 @@ private:
 private:
 	struct Statistics
 	{
-		uint64_t reads;
-		uint64_t writes;
-		uint64_t splits;
-		uint64_t hits;
-		uint64_t misses;
-		uint32_t nodes;
-		uint64_t adjustments;
-		uint64_t query_results;
-		uint64_t data;
-		uint32_t tree_height;
+		uint64_t reads = 0;
+		uint64_t writes = 0;
+		uint64_t splits = 0;
+		uint64_t hits = 0;
+		uint64_t misses = 0;
+		uint32_t nodes = 0;
+		uint64_t adjustments = 0;
+		uint64_t query_results = 0;
+		uint64_t data = 0;
+		uint32_t tree_height = 0;
 		std::vector<uint32_t> nodes_in_level;
 	};
 
@@ -73,8 +78,8 @@ private:
 
 	double m_fill_factor = 0.7;
 
-	uint32_t m_index_capacity = 100;
-	uint32_t m_leaf_capacity = 100;
+	uint32_t m_index_capacity = 10;
+	uint32_t m_leaf_capacity = 10;
 
 	uint32_t m_near_minimum_overlap_factor = 32;
 	double m_split_distribution_factor = 0.4;

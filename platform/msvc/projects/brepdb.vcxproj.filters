@@ -72,6 +72,9 @@
     <ClInclude Include="..\..\..\include\brepdb\ObjVisitor.h">
       <Filter>app</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\brepdb\DiskStorageManager.h">
+      <Filter>storage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\Point.cpp">
@@ -106,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\source\Leaf.cpp">
       <Filter>rtree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\DiskStorageManager.cpp">
+      <Filter>storage</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

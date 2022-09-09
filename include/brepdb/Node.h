@@ -50,6 +50,8 @@ public:
 
 	virtual void Split(uint32_t data_len, uint8_t* data, const Region& mbr, id_type id, std::shared_ptr<Node>& left, std::shared_ptr<Node>& right) = 0;
 
+	auto& GetRegion() const { return m_node_mbr; }
+
 protected:
 	Node(RTree* tree, id_type id, uint32_t level, uint32_t capacity);
 
