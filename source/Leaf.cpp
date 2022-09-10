@@ -97,11 +97,11 @@ void Leaf::DeleteData(const Region& mbr, id_type id, std::stack<id_type>& path_b
 		for (uint32_t c_child = 0; c_child < n->m_children; ++c_child)
 		{
 			// keep this in the for loop. The tree height might change after insertions.
-			uint8_t* overflowTable = new uint8_t[m_tree->m_stats.tree_height];
-			memset(overflowTable, 0, m_tree->m_stats.tree_height);
-			m_tree->insertData_impl(n->m_children_data_len[c_child], n->m_children_data[c_child], n->m_children_mbr[c_child], n->m_children_id[c_child], n->m_level, overflowTable);
+			uint8_t* overflow_tbl = new uint8_t[m_tree->m_stats.tree_height];
+			memset(overflow_tbl, 0, m_tree->m_stats.tree_height);
+			m_tree->InsertDataImpl(n->m_children_data_len[c_child], n->m_children_data[c_child], n->m_children_mbr[c_child], n->m_children_id[c_child], n->m_level, overflow_tbl);
 			n->m_children_data[c_child] = nullptr;
-			delete[] overflowTable;
+			delete[] overflow_tbl;
 		}
 	}
 }

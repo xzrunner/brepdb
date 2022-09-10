@@ -45,9 +45,9 @@ private:
 	void StoreHeader();
 	void LoadHeader();
 
-	void insertData_impl(uint32_t data_len, uint8_t* data, Region& mbr, id_type id);
-	void insertData_impl(uint32_t data_len, uint8_t* data, Region& mbr, id_type id, uint32_t level, uint8_t* overflow_tbl);
-	bool deleteData_impl(const Region& mbr, id_type id);
+	void InsertDataImpl(uint32_t data_len, uint8_t* data, Region& mbr, id_type id);
+	void InsertDataImpl(uint32_t data_len, uint8_t* data, Region& mbr, id_type id, uint32_t level, uint8_t* overflow_tbl);
+	bool DeleteDataImpl(const Region& mbr, id_type id);
 
 	void RangeQuery(RangeQueryType type, const IShape& query, IVisitor& v);
 	void SelfJoinQuery(id_type id1, id_type id2, const Region& r, IVisitor& vis);
@@ -78,8 +78,8 @@ private:
 
 	double m_fill_factor = 0.7;
 
-	uint32_t m_index_capacity = 10;
-	uint32_t m_leaf_capacity = 10;
+	uint32_t m_index_capacity = 100;
+	uint32_t m_leaf_capacity = 100;
 
 	uint32_t m_near_minimum_overlap_factor = 32;
 	double m_split_distribution_factor = 0.4;

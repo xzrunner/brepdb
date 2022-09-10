@@ -208,7 +208,7 @@ void RTree::InsertData(uint32_t len, const uint8_t* data, const IShape& shape, i
 		memcpy(buffer, data, len);
 	}
 
-	insertData_impl(len, buffer, mbr, shape_id);
+	InsertDataImpl(len, buffer, mbr, shape_id);
 		// the buffer is stored in the tree. Do not delete here.
 }
 
@@ -217,7 +217,7 @@ bool RTree::DeleteData(const IShape& shape, id_type shape_id)
 	Region mbr;
 	shape.GetMBR(mbr);
 
-	return deleteData_impl(mbr, shape_id);
+	return DeleteDataImpl(mbr, shape_id);
 }
 
 void RTree::LevelTraversal(IVisitor& v)
@@ -232,7 +232,7 @@ void RTree::LevelTraversal(IVisitor& v)
 		{
 			std::shared_ptr<Node> n = st.top(); st.pop();
 
-			if(n->m_level == 0)
+			if (n->m_level == 0)
 			{
 				v.VisitNode(*n);
 			}
@@ -293,7 +293,7 @@ void RTree::InternalNodesQuery(const IShape& query, IVisitor& v)
 						}
 					}
 				}
-				else //not a leaf
+				else
 				{
 					if (query.IntersectsShape(n->m_node_mbr))
 					{
@@ -324,13 +324,13 @@ void RTree::ContainsWhatQuery(const IShape& query, IVisitor& v)
 		{
 			std::shared_ptr<Node> n = st.top(); st.pop();
 
-			if(n->m_level == 0)
+			if (n->m_level == 0)
 			{
 				v.VisitNode(*n);
 
 				for (int i = 0; i < n->m_children; ++i)
 				{
-					if(query.ContainsShape(n->m_children_mbr[i]))
+					if (query.ContainsShape(n->m_children_mbr[i]))
 					{
 						Data data = Data(n->m_children_data_len[i], n->m_children_data[i], n->m_children_mbr[i], n->m_children_id[i]);
 						v.VisitData(data);
@@ -338,13 +338,13 @@ void RTree::ContainsWhatQuery(const IShape& query, IVisitor& v)
 					}
 				}
 			}
-			else //not a leaf
+			else
 			{
-				if(query.ContainsShape(n->m_node_mbr))
+				if (query.ContainsShape(n->m_node_mbr))
 				{
 					VisitSubTree(n, v);
 				}
-				else if(query.IntersectsShape(n->m_node_mbr))
+				else if (query.IntersectsShape(n->m_node_mbr))
 				{
 					v.VisitNode(*n);
 
@@ -608,7 +608,7 @@ id_type RTree::WriteNode(const Node& n)
 			throw IllegalStateException("writeNode: writing past the end of m_nodesInLevel.");
 		}
 #else
-		m_stats.m_nodesInLevel[n->m_level] = m_stats.m_nodesInLevel[n->m_level] + 1;
+		m_stats.nodes_in_level[n.m_level] = m_stats.nodes_in_level[n.m_level] + 1;
 #endif
 	}
 
@@ -817,7 +817,7 @@ void RTree::LoadHeader()
 	delete[] header;
 }
 
-void RTree::insertData_impl(uint32_t data_len, uint8_t* data, Region& mbr, id_type id) 
+void RTree::InsertDataImpl(uint32_t data_len, uint8_t* data, Region& mbr, id_type id) 
 {
 	std::stack<id_type> path_buf;
 	uint8_t* overflow_tbl = nullptr;
@@ -842,7 +842,7 @@ void RTree::insertData_impl(uint32_t data_len, uint8_t* data, Region& mbr, id_ty
 	}
 }
 
-void RTree::insertData_impl(uint32_t data_len, uint8_t* data, Region& mbr, id_type id, uint32_t level, uint8_t* overflow_tbl) 
+void RTree::InsertDataImpl(uint32_t data_len, uint8_t* data, Region& mbr, id_type id, uint32_t level, uint8_t* overflow_tbl) 
 {
 	std::stack<id_type> path_buf;
 	std::shared_ptr<Node> root = ReadNode(m_root_id);
@@ -857,7 +857,7 @@ void RTree::insertData_impl(uint32_t data_len, uint8_t* data, Region& mbr, id_ty
 	n->InsertData(data_len, data, mbr, id, path_buf, overflow_tbl);
 }
 
-bool RTree::deleteData_impl(const Region& mbr, id_type id) 
+bool RTree::DeleteDataImpl(const Region& mbr, id_type id) 
 {
 	std::stack<id_type> path_buf;
 	std::shared_ptr<Node> root = ReadNode(m_root_id);

@@ -474,7 +474,7 @@ bool Node::InsertData(uint32_t data_len, uint8_t* data, const Region& mbr, id_ty
 
 		for (c_idx = 0; c_idx < l_reinsert; ++c_idx)
 		{
-			m_tree->insertData_impl(
+			m_tree->InsertDataImpl(
 				reinsertlen[c_idx], reinsertdata[c_idx],
 				reinsertmbr[c_idx], reinsertid[c_idx],
 				m_level, overflow_tbl);
