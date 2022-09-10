@@ -349,7 +349,9 @@ void RTree::ContainsWhatQuery(const IShape& query, IVisitor& v)
 					v.VisitNode(*n);
 
 					for (int i = 0; i < n->m_children; ++i) {
-						st.push(ReadNode(n->m_children_id[i]));
+						if (query.IntersectsShape(n->m_children_mbr[i])) {
+							st.push(ReadNode(n->m_children_id[i]));
+						}
 					}
 				}
 			}
