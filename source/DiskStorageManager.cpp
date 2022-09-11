@@ -3,6 +3,8 @@
 
 #include <filesystem>
 
+#include <assert.h>
+
 namespace brepdb
 {
 
@@ -10,6 +12,7 @@ DiskStorageManager::DiskStorageManager(const std::string& filename, bool overwri
 	: m_page_size(0)
 	, m_next_page(-1)
 	, m_buffer(nullptr)
+	, m_lru(4096)
 {
 	Initialize(filename, overwrite, page_size);
 }
@@ -30,6 +33,19 @@ DiskStorageManager::~DiskStorageManager()
 
 void DiskStorageManager::LoadByteArray(const id_type page, uint32_t& len, uint8_t** data)
 {
+	const CachePage* cp = m_lru.Find(page);
+	if (cp)
+	{
+		m_lru.Touch(const_cast<CachePage*>(cp));
+
+		len = cp->GetLength();
+		*data = new uint8_t[len];
+		assert(*data);
+		memcpy(*data, cp->GetData(), len);
+
+		return;
+	}
+
 	auto it = m_page_index.find(page);
 	if (it == m_page_index.end()) {
 		throw InvalidPageException(page);
@@ -41,6 +57,7 @@ void DiskStorageManager::LoadByteArray(const id_type page, uint32_t& len, uint8_
 
 	len = (*it).second->length;
 	*data = new uint8_t[len];
+	assert(*data);
 
 	uint8_t* ptr = *data;
 	uint32_t c_len = 0;
@@ -66,6 +83,8 @@ void DiskStorageManager::LoadByteArray(const id_type page, uint32_t& len, uint8_
 		++c_next;
 	}
 	while (c_next < c_total);
+
+	m_lru.AddFront(page, len, *data);
 }
 
 void DiskStorageManager::StoreByteArray(id_type& page, const uint32_t len, const uint8_t* const data)
@@ -113,6 +132,8 @@ void DiskStorageManager::StoreByteArray(id_type& page, const uint32_t len, const
 
 		page = e->pages[0];
 		m_page_index.insert(std::pair<id_type, Entry*>(page, e));
+
+		m_lru.AddFront(page, len, data);
 	}
 	else
 	{
@@ -177,7 +198,9 @@ void DiskStorageManager::StoreByteArray(id_type& page, const uint32_t len, const
 
 		m_page_index.insert(std::pair<id_type, Entry*>(page, e));
 		delete old_entry;
-	}
+
+		m_lru.Modify(page, len, data);
+	}	
 }
 
 void DiskStorageManager::DeleteByteArray(const id_type page)
@@ -186,6 +209,8 @@ void DiskStorageManager::DeleteByteArray(const id_type page)
 	if (it == m_page_index.end()) {
 		throw InvalidPageException(page);
 	}
+
+	m_lru.Remove(page);
 
 	for (uint32_t i = 0; i < (*it).second->pages.size(); ++i) {
 		m_empty_pages.insert((*it).second->pages[i]);
@@ -304,6 +329,7 @@ bool DiskStorageManager::Initialize(const std::string& filename, bool overwrite,
 	}
 
 	m_buffer = new uint8_t[m_page_size];
+	assert(m_buffer);
 	memset(m_buffer, 0, m_page_size);
 
 	if (!overwrite && length > 0)
@@ -363,6 +389,173 @@ bool DiskStorageManager::Initialize(const std::string& filename, bool overwrite,
 	}
 
 	return true;
+}
+
+//
+// class DiskStorageManager::LRUCollection
+//
+
+DiskStorageManager::LRUCollection::~LRUCollection()
+{
+	for (auto itr : m_map) {
+		delete itr.second;
+	}
+}
+
+bool DiskStorageManager::LRUCollection::AddFront(id_type id, uint32_t len, const uint8_t* data)
+{
+	while (m_map.size() >= m_capacity) {
+		RemoveBack();
+	}
+
+	CachePage* front = new CachePage(id, len, data);
+	m_map.insert({ id, front });
+
+	front->m_prev = nullptr;
+	front->m_next = m_list_begin;
+
+	if (m_list_begin)
+	{
+		m_list_begin->m_prev = front;
+		m_list_begin = front;
+	}
+	else
+	{
+		m_list_begin = front;
+		m_list_end = front;
+	}
+
+	return true;
+}
+
+bool DiskStorageManager::LRUCollection::RemoveBack()
+{
+	if (m_map.empty()) {
+		return false;
+	}
+
+	assert(m_list_end);
+	CachePage* back = m_list_end;
+
+	m_map.erase(back->m_id);
+
+	if (m_list_begin == m_list_end)
+	{
+		m_list_begin = nullptr;
+		m_list_end = nullptr;
+	}
+	else
+	{
+		if (back->m_prev) {
+			back->m_prev->m_next = nullptr;
+		}
+		m_list_end = back->m_prev;
+		m_list_end->m_next = nullptr;
+	}
+
+	delete back;
+
+	return true;
+}
+
+bool DiskStorageManager::LRUCollection::Remove(id_type id)
+{
+	auto itr = m_map.find(id);
+	if (itr == m_map.end()) {
+		return false;
+	}
+
+	auto page = itr->second;
+
+	m_map.erase(itr);
+
+	if (m_list_begin == m_list_end)
+	{
+		m_list_begin = nullptr;
+		m_list_end = nullptr;
+	}
+	else
+	{
+		if (page->m_prev) {
+			page->m_prev->m_next = page->m_next;
+		}
+		if (page->m_next) {
+			page->m_next->m_prev = page->m_prev;
+		}
+
+		if (m_list_begin == page) {
+			m_list_begin = page->m_next;
+		}
+		if (m_list_end == page) {
+			m_list_end = page->m_prev;
+		}
+	}
+
+	delete page;
+
+	return true;
+}
+
+bool DiskStorageManager::LRUCollection::Modify(id_type id, uint32_t len, const uint8_t* data)
+{
+	auto itr = m_map.find(id);
+	if (itr == m_map.end()) {
+		return false;
+	}
+
+	auto page = itr->second;
+
+	page->m_len = len;
+	delete[] page->m_data;
+	page->m_data = new uint8_t[len];
+	assert(page->m_data);
+	memcpy(page->m_data, data, len);
+
+	Touch(page);
+
+	return true;
+}
+
+const DiskStorageManager::CachePage* 
+DiskStorageManager::LRUCollection::Find(id_type id) const
+{
+	auto itr = m_map.find(id);
+	if (itr != m_map.end()) {
+		return itr->second;
+	} else {
+		return nullptr;
+	}
+}
+
+void DiskStorageManager::LRUCollection::Touch(CachePage* page)
+{
+	if (m_map.empty() || !page) {
+		return;
+	}
+
+	CachePage* curr = page;
+	if (curr == m_list_begin) {
+		return;
+	}
+	if (curr == m_list_end) {
+		m_list_end = curr->m_prev;
+	}
+
+	auto prev = curr->m_prev;
+	auto next = curr->m_next;
+	if (prev) {
+		prev->m_next = next;
+	}
+	if (next) {
+		next->m_prev = prev;
+	}
+
+	curr->m_next = m_list_begin;
+	if (m_list_begin) {
+		m_list_begin->m_prev = curr;
+	}
+	curr->m_prev = nullptr;
+	m_list_begin = curr;
 }
 
 }
