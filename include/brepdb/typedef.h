@@ -2,6 +2,11 @@
 
 #include <cstdint>
 
-#define DIMENSION 3
+namespace brepdb
+{
 
-typedef int64_t id_type;
+static const int DIMENSION = 3;
+
+using id_type = int64_t;
+
+}
