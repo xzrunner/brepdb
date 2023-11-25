@@ -232,11 +232,9 @@ void RTree::LevelTraversal(IVisitor& v)
 		{
 			std::shared_ptr<Node> n = st.top(); st.pop();
 
-			if (n->m_level == 0)
-			{
-				v.VisitNode(*n);
-			}
-			else
+			v.VisitNode(*n);
+
+			if (n->IsIndex())
 			{
 				for (int i = 0; i < n->m_children; ++i) {
 					st.push(ReadNode(n->m_children_id[i]));
@@ -246,7 +244,7 @@ void RTree::LevelTraversal(IVisitor& v)
 
 	}
 	catch (...)
-	{
+	{ 
 		throw;
 	}
 }
