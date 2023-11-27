@@ -10,7 +10,9 @@ class IdVisitor : public IVisitor
 public:
     IdVisitor() {}
     
-    virtual void VisitNode(const INode& n) override {}
+    virtual brepdb::VisitorStatus VisitNode(const INode& n) override { 
+        return brepdb::VisitorStatus::Continue;
+    }
     virtual void VisitData(const IData& d) override {
         m_results += 1;
         m_vector.push_back(d.GetIdentifier());

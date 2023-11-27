@@ -15,7 +15,9 @@ public:
         }
     }
     
-    virtual void VisitNode(const INode& n) override {}
+    virtual brepdb::VisitorStatus VisitNode(const INode& n) override { 
+        return brepdb::VisitorStatus::Continue;
+    }
     virtual void VisitData(const IData& d) override {
         IData* item = dynamic_cast<IData*>(const_cast<IData&>(d).Clone());
         ++m_results;

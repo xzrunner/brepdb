@@ -27,6 +27,13 @@ enum RangeQueryType
 	IntersectionQuery = 0x2
 };
 
+enum class VisitorStatus
+{
+	Stop,
+	Skip,
+	Continue
+};
+
 class Point;
 class Region;
 
@@ -107,7 +114,7 @@ public:
 class IVisitor
 {
 public:
-	virtual void VisitNode(const INode& in) = 0;
+	virtual VisitorStatus VisitNode(const INode& in) = 0;
 	virtual void VisitData(const IData& in) = 0;
 	virtual void VisitData(std::vector<const IData*>& v) = 0;
 	virtual ~IVisitor() = default;

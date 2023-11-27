@@ -232,12 +232,15 @@ void RTree::LevelTraversal(IVisitor& v)
 		{
 			std::shared_ptr<Node> n = st.top(); st.pop();
 
-			v.VisitNode(*n);
+			VisitorStatus status = v.VisitNode(*n);
 
 			if (n->IsIndex())
 			{
-				for (int i = 0; i < n->m_children; ++i) {
-					st.push(ReadNode(n->m_children_id[i]));
+				if (status == VisitorStatus::Continue)
+				{
+					for (int i = 0; i < n->m_children; ++i) {
+						st.push(ReadNode(n->m_children_id[i]));
+					}
 				}
 			}
 		}
@@ -344,11 +347,13 @@ void RTree::ContainsWhatQuery(const IShape& query, IVisitor& v)
 				}
 				else if (query.IntersectsShape(n->m_node_mbr))
 				{
-					v.VisitNode(*n);
-
-					for (int i = 0; i < n->m_children; ++i) {
-						if (query.IntersectsShape(n->m_children_mbr[i])) {
-							st.push(ReadNode(n->m_children_id[i]));
+					VisitorStatus status = v.VisitNode(*n);
+					if (status == VisitorStatus::Continue)
+					{
+						for (int i = 0; i < n->m_children; ++i) {
+							if (query.IntersectsShape(n->m_children_mbr[i])) {
+								st.push(ReadNode(n->m_children_id[i]));
+							}
 						}
 					}
 				}
@@ -402,20 +407,24 @@ void RTree::NearestNeighborQuery(uint32_t k, const IShape& query, IVisitor& v, I
 		{
 			// n is a leaf or an index.
 			std::shared_ptr<Node> n = ReadNode(pFirst->m_id);
-			v.VisitNode(*n);
 
-			for (int i = 0; i < n->m_children; ++i)
+			VisitorStatus status = v.VisitNode(*n);
+
+			if (status == VisitorStatus::Continue)
 			{
-				if (n->m_level == 0)
+				for (int i = 0; i < n->m_children; ++i)
 				{
-					Data* e = new Data(n->m_children_data_len[i], n->m_children_data[i], n->m_children_mbr[i], n->m_children_id[i]);
-					// we need to compare the query with the actual data entry here, so we call the
-					// appropriate getMinimumDistance method of NearestNeighborComparator.
-					queue.push(new NNEntry(n->m_children_id[i], e, nnc.GetMinimumDistance(query, *e)));
-				}
-				else
-				{
-					queue.push(new NNEntry(n->m_children_id[i], nullptr, nnc.GetMinimumDistance(query, n->m_children_mbr[i])));
+					if (n->m_level == 0)
+					{
+						Data* e = new Data(n->m_children_data_len[i], n->m_children_data[i], n->m_children_mbr[i], n->m_children_id[i]);
+						// we need to compare the query with the actual data entry here, so we call the
+						// appropriate getMinimumDistance method of NearestNeighborComparator.
+						queue.push(new NNEntry(n->m_children_id[i], e, nnc.GetMinimumDistance(query, *e)));
+					}
+					else
+					{
+						queue.push(new NNEntry(n->m_children_id[i], nullptr, nnc.GetMinimumDistance(query, n->m_children_mbr[i])));
+					}
 				}
 			}
 		}
@@ -896,8 +905,7 @@ void RTree::RangeQuery(RangeQueryType type, const IShape& query, IVisitor& v)
 				bool b;
 				if (type == ContainmentQuery) {
 					b = query.ContainsShape(n->m_children_mbr[i]);
-				}
-				else {
+				} else {
 					b = query.IntersectsShape(n->m_children_mbr[i]);
 				}
 
@@ -911,12 +919,14 @@ void RTree::RangeQuery(RangeQueryType type, const IShape& query, IVisitor& v)
 		}
 		else
 		{
-			v.VisitNode(*n);
-
-			for (int i = 0; i < n->m_children; ++i)
+			VisitorStatus status = v.VisitNode(*n);
+			if (status == VisitorStatus::Continue)
 			{
-				if (query.IntersectsShape(n->m_children_mbr[i])) {
-					st.push(ReadNode(n->m_children_id[i]));
+				for (int i = 0; i < n->m_children; ++i)
+				{
+					if (query.IntersectsShape(n->m_children_mbr[i])) {
+						st.push(ReadNode(n->m_children_id[i]));
+					}
 				}
 			}
 		}
@@ -972,7 +982,8 @@ void RTree::VisitSubTree(const std::shared_ptr<Node>& sub_tree, IVisitor& v)
 	while (!st.empty())
 	{
 		std::shared_ptr<Node> n = st.top(); st.pop();
-		v.VisitNode(*n);
+
+		VisitorStatus status = v.VisitNode(*n);
 
 		if (n->m_level == 0)
 		{
@@ -985,9 +996,12 @@ void RTree::VisitSubTree(const std::shared_ptr<Node>& sub_tree, IVisitor& v)
 		}
 		else
 		{
-			for (int i = 0; i < n->m_children; ++i)
+			if (status == VisitorStatus::Continue)
 			{
-				st.push(ReadNode(n->m_children_id[i]));
+				for (int i = 0; i < n->m_children; ++i)
+				{
+					st.push(ReadNode(n->m_children_id[i]));
+				}
 			}
 		}
 	}
