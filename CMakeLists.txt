@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.16)
 
 project(brepdb)
 
@@ -64,8 +64,8 @@ set(ALL_FILES
     ${tools}
 )
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
-
 add_library(brepdb ${ALL_FILES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 target_compile_features(brepdb PRIVATE cxx_std_17)
