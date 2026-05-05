@@ -48,7 +48,7 @@ Point* Point::Clone()
 
 uint32_t Point::GetByteArraySize() const
 {
-	return (sizeof(uint32_t) + DIMENSION * sizeof(double));
+	return DIMENSION * sizeof(double);
 }
 
 void Point::LoadFromByteArray(const uint8_t* data)

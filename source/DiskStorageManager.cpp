@@ -295,7 +295,7 @@ bool DiskStorageManager::Initialize(const std::string& filename, bool overwrite,
 
 	std::ios_base::openmode mode = std::ios::in | std::ios::out | std::ios::binary;
 	const bool files_exists = std::filesystem::exists(index_file) && 
-		std::filesystem::exists(index_file);
+		std::filesystem::exists(data_file);
 	if (!files_exists || overwrite) {
 		mode |= std::ios::trunc;
 	}

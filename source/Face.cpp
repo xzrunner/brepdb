@@ -149,7 +149,7 @@ void Face::GetMBR(Region& r) const
 	for (int i = 0; i < m_num; ++i) {
 		for (int j = 0; j < DIMENSION; ++j) {
 			low[j] = std::min(low[j], *ptr);
-			high[j] = std::min(low[j], *ptr);
+			high[j] = std::max(high[j], *ptr);
 			++ptr;
 		}
 	}
