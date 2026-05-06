@@ -1,10 +1,10 @@
 #pragma once
 
-#include "brepdb/SpatialIndex.h"
+#include "spatialdb/SpatialIndex.h"
 
 #include <memory>
 
-namespace brepdb
+namespace spatialdb
 {
 
 class Node;

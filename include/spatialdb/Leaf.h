@@ -1,8 +1,8 @@
 #pragma once
 
-#include "brepdb/Node.h"
+#include "spatialdb/Node.h"
 
-namespace brepdb
+namespace spatialdb
 {
 
 class Leaf : public Node, public std::enable_shared_from_this<Leaf>

@@ -1,11 +1,11 @@
-#include "brepdb/DiskStorageManager.h"
-#include "brepdb/Exception.h"
+#include "spatialdb/DiskStorageManager.h"
+#include "spatialdb/Exception.h"
 
 #include <filesystem>
 
 #include <assert.h>
 
-namespace brepdb
+namespace spatialdb
 {
 
 DiskStorageManager::DiskStorageManager(const std::string& filename, bool overwrite, uint32_t page_size)

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "brepdb/SpatialIndex.h"
+#include "spatialdb/SpatialIndex.h"
 
 #include <fstream>
 #include <set>
 #include <map>
 
-namespace brepdb
+namespace spatialdb
 {
 
 class DiskStorageManager : public IStorageManager

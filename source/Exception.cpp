@@ -1,8 +1,8 @@
-#include "brepdb/Exception.h"
+#include "spatialdb/Exception.h"
 
 #include <sstream>
 
-namespace brepdb
+namespace spatialdb
 {
 
 IndexOutOfBoundsException::IndexOutOfBoundsException(size_t i)

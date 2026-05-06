@@ -1,8 +1,8 @@
-#include "brepdb/Node.h"
-#include "brepdb/Index.h"
-#include "brepdb/RTree.h"
-#include "brepdb/Exception.h"
-#include "brepdb/Point.h"
+#include "spatialdb/Node.h"
+#include "spatialdb/Index.h"
+#include "spatialdb/RTree.h"
+#include "spatialdb/Exception.h"
+#include "spatialdb/Point.h"
 
 #include <exception>
 #include <string>
@@ -13,7 +13,7 @@
 namespace
 {
 
-using brepdb::Region;
+using spatialdb::Region;
 
 class RStarSplitEntry
 {
@@ -100,7 +100,7 @@ public:
 
 }
 
-namespace brepdb
+namespace spatialdb
 {
 
 Node::Node(RTree* tree, id_type id, uint32_t level, uint32_t capacity)

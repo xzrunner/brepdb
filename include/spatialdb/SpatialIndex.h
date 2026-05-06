@@ -1,12 +1,12 @@
 #pragma once
 
-#include "brepdb/Tools.h"
-#include "brepdb/typedef.h"
+#include "spatialdb/Tools.h"
+#include "spatialdb/typedef.h"
 
 #include <vector>
 #include <memory>
 
-namespace brepdb
+namespace spatialdb
 {
 
 enum RTreeVariant

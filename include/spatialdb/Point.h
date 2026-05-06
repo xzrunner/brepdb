@@ -1,9 +1,9 @@
 #pragma once
 
-#include "brepdb/SpatialIndex.h"
-#include "brepdb/typedef.h"
+#include "spatialdb/SpatialIndex.h"
+#include "spatialdb/typedef.h"
 
-namespace brepdb
+namespace spatialdb
 {
 
 class Point : public IShape

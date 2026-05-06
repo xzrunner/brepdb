@@ -1,8 +1,8 @@
-#include "brepdb/Leaf.h"
-#include "brepdb/RTree.h"
-#include "brepdb/Exception.h"
+#include "spatialdb/Leaf.h"
+#include "spatialdb/RTree.h"
+#include "spatialdb/Exception.h"
 
-namespace brepdb
+namespace spatialdb
 {
 
 Leaf::Leaf(RTree* tree, id_type id)

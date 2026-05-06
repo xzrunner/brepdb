@@ -1,10 +1,10 @@
-#include "brepdb/Index.h"
-#include "brepdb/RTree.h"
-#include "brepdb/Exception.h"
+#include "spatialdb/Index.h"
+#include "spatialdb/RTree.h"
+#include "spatialdb/Exception.h"
 
 #include <assert.h>
 
-namespace brepdb
+namespace spatialdb
 {
 
 Index::Index(RTree* tree, id_type id, uint32_t level) 

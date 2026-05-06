@@ -1,9 +1,9 @@
-#include "brepdb/MemoryStorageManager.h"
-#include "brepdb/Exception.h"
+#include "spatialdb/MemoryStorageManager.h"
+#include "spatialdb/Exception.h"
 
 #include <stdexcept>
 
-namespace brepdb
+namespace spatialdb
 {
 	
 MemoryStorageManager::~MemoryStorageManager()

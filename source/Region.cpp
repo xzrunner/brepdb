@@ -1,14 +1,14 @@
-#include "brepdb/Region.h"
-#include "brepdb/Point.h"
-#include "brepdb/Edge.h"
-#include "brepdb/ShapeType.h"
+#include "spatialdb/Region.h"
+#include "spatialdb/Point.h"
+#include "spatialdb/Edge.h"
+#include "spatialdb/ShapeType.h"
 
 #include <cmath>
 #include <cstring>
 #include <limits>
 #include <algorithm>
 
-namespace brepdb
+namespace spatialdb
 {
 
 Region::Region()

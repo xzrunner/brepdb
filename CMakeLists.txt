@@ -1,22 +1,22 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(brepdb)
+project(spatialdb)
 
 ################################################################################
 # Source groups
 ################################################################################
 set(app
-    "include/brepdb/IdVisitor.h"
-    "include/brepdb/ObjVisitor.h"
+    "include/spatialdb/IdVisitor.h"
+    "include/spatialdb/ObjVisitor.h"
 )
 source_group("app" FILES ${app})
 
 set(rtree
-    "include/brepdb/Index.h"
-    "include/brepdb/Leaf.h"
-    "include/brepdb/Node.h"
-    "include/brepdb/RTree.h"
-    "include/brepdb/Statistics.h"
+    "include/spatialdb/Index.h"
+    "include/spatialdb/Leaf.h"
+    "include/spatialdb/Node.h"
+    "include/spatialdb/RTree.h"
+    "include/spatialdb/Statistics.h"
     "source/Index.cpp"
     "source/Leaf.cpp"
     "source/Node.cpp"
@@ -25,11 +25,11 @@ set(rtree
 source_group("rtree" FILES ${rtree})
 
 set(shape
-    "include/brepdb/Edge.h"
-    "include/brepdb/Face.h"
-    "include/brepdb/Point.h"
-    "include/brepdb/Region.h"
-    "include/brepdb/ShapeType.h"
+    "include/spatialdb/Edge.h"
+    "include/spatialdb/Face.h"
+    "include/spatialdb/Point.h"
+    "include/spatialdb/Region.h"
+    "include/spatialdb/ShapeType.h"
     "source/Edge.cpp"
     "source/Face.cpp"
     "source/Point.cpp"
@@ -38,19 +38,19 @@ set(shape
 source_group("shape" FILES ${shape})
 
 set(storage
-    "include/brepdb/DiskStorageManager.h"
-    "include/brepdb/MemoryStorageManager.h"
+    "include/spatialdb/DiskStorageManager.h"
+    "include/spatialdb/MemoryStorageManager.h"
     "source/DiskStorageManager.cpp"
     "source/MemoryStorageManager.cpp"
 )
 source_group("storage" FILES ${storage})
 
 set(tools
-    "include/brepdb/Exception.h"
-    "include/brepdb/Math.h"
-    "include/brepdb/SpatialIndex.h"
-    "include/brepdb/Tools.h"
-    "include/brepdb/typedef.h"
+    "include/spatialdb/Exception.h"
+    "include/spatialdb/Math.h"
+    "include/spatialdb/SpatialIndex.h"
+    "include/spatialdb/Tools.h"
+    "include/spatialdb/typedef.h"
     "source/Exception.cpp"
     "source/Math.cpp"
 )
@@ -64,8 +64,8 @@ set(ALL_FILES
     ${tools}
 )
 
-add_library(brepdb ${ALL_FILES})
+add_library(spatialdb ${ALL_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
-target_compile_features(brepdb PRIVATE cxx_std_17)
+target_compile_features(spatialdb PRIVATE cxx_std_17)

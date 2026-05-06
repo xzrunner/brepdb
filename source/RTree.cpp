@@ -1,9 +1,9 @@
-#include "brepdb/RTree.h"
-#include "brepdb/Node.h"
-#include "brepdb/Index.h"
-#include "brepdb/Leaf.h"
-#include "brepdb/Exception.h"
-#include "brepdb/IdVisitor.h"
+#include "spatialdb/RTree.h"
+#include "spatialdb/Node.h"
+#include "spatialdb/Index.h"
+#include "spatialdb/Leaf.h"
+#include "spatialdb/Exception.h"
+#include "spatialdb/IdVisitor.h"
 
 #include <iostream>
 #include <queue>
@@ -14,7 +14,7 @@
 namespace
 {
 
-using namespace brepdb;
+using namespace spatialdb;
 
 class Data : public IData, public ISerializable
 {
@@ -177,7 +177,7 @@ public:
 
 }
 
-namespace brepdb
+namespace spatialdb
 {
 
 RTree::RTree(const std::shared_ptr<IStorageManager>& sm, bool overwrite)

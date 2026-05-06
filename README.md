@@ -1,6 +1,6 @@
-# brepdb
+# spatialdb
 
-Spatial database for BRep geometry
+Spatial database.
 
 ## Reference
 

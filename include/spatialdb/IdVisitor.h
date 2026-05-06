@@ -1,8 +1,8 @@
 #pragma once
 
-#include "brepdb/SpatialIndex.h"
+#include "spatialdb/SpatialIndex.h"
 
-namespace brepdb
+namespace spatialdb
 {
 
 class IdVisitor : public IVisitor
@@ -10,8 +10,8 @@ class IdVisitor : public IVisitor
 public:
     IdVisitor() {}
     
-    virtual brepdb::VisitorStatus VisitNode(const INode& n) override { 
-        return brepdb::VisitorStatus::Continue;
+    virtual spatialdb::VisitorStatus VisitNode(const INode& n) override { 
+        return spatialdb::VisitorStatus::Continue;
     }
     virtual void VisitData(const IData& d) override {
         m_results += 1;

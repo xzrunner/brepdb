@@ -1,6 +1,6 @@
 #pragma once
 
-namespace brepdb
+namespace spatialdb
 {
 
 class Point;

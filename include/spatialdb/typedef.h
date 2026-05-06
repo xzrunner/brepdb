@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace brepdb
+namespace spatialdb
 {
 
 static const int DIMENSION = 3;

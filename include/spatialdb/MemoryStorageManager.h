@@ -1,10 +1,10 @@
 #pragma once
 
-#include "brepdb/SpatialIndex.h"
+#include "spatialdb/SpatialIndex.h"
 
 #include <stack>
 
-namespace brepdb
+namespace spatialdb
 {
 
 class MemoryStorageManager : public IStorageManager

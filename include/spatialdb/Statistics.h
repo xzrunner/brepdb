@@ -1,8 +1,8 @@
 #pragma once
 
-#include "brepdb/SpatialIndex.h"
+#include "spatialdb/SpatialIndex.h"
 
-namespace brepdb
+namespace spatialdb
 {
 
 class Statistics : public IStatistics

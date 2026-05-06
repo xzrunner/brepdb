@@ -1,10 +1,10 @@
 #pragma once
 
-#include "brepdb/typedef.h"
+#include "spatialdb/typedef.h"
 
 #include <string>
 
-namespace brepdb
+namespace spatialdb
 {
 
 class Exception

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "brepdb/SpatialIndex.h"
-#include "brepdb/Region.h"
+#include "spatialdb/SpatialIndex.h"
+#include "spatialdb/Region.h"
 
 #include <stack>
 #include <memory>
 
-namespace brepdb
+namespace spatialdb
 {
 
 class RTree;

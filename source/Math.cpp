@@ -1,7 +1,7 @@
-#include "brepdb/Math.h"
-#include "brepdb/Point.h"
+#include "spatialdb/Math.h"
+#include "spatialdb/Point.h"
 
-namespace brepdb
+namespace spatialdb
 {
 
 double Math::DoubleAreaTriangle(const Point& a, const Point& b, const Point& c) 

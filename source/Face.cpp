@@ -1,13 +1,13 @@
-#include "brepdb/Face.h"
-#include "brepdb/Point.h"
-#include "brepdb/Region.h"
-#include "brepdb/ShapeType.h"
+#include "spatialdb/Face.h"
+#include "spatialdb/Point.h"
+#include "spatialdb/Region.h"
+#include "spatialdb/ShapeType.h"
 
 #include <cstring>
 #include <limits>
 #include <algorithm>
 
-namespace brepdb
+namespace spatialdb
 {
 
 Face::Face(const double* verts, size_t num)

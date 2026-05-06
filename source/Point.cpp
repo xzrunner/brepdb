@@ -1,12 +1,12 @@
-#include "brepdb/Point.h"
-#include "brepdb/Region.h"
-#include "brepdb/ShapeType.h"
+#include "spatialdb/Point.h"
+#include "spatialdb/Region.h"
+#include "spatialdb/ShapeType.h"
 
 #include <cmath>
 #include <cstring>
 #include <limits>
 
-namespace brepdb
+namespace spatialdb
 {
 
 Point::Point()
