@@ -3,6 +3,8 @@
 #include "spatialdb/SpatialIndex.h"
 
 #include <memory>
+#include <map>
+#include <string>
 
 namespace spatialdb
 {
@@ -38,6 +40,11 @@ public:
 	id_type WriteNode(const Node& n);
 	std::shared_ptr<Node> ReadNode(id_type page);
 	void DeleteNode(const Node& n);
+
+	void SetMetaPage(const std::string& key, id_type page);
+	id_type GetMetaPage(const std::string& key) const;
+	bool HasMetaPage(const std::string& key) const;
+	void RemoveMetaPage(const std::string& key);
 
 private:
 	void InitNew();
@@ -92,6 +99,8 @@ private:
 	std::vector<std::shared_ptr<ICommand>> m_write_node_cmds;
 	std::vector<std::shared_ptr<ICommand>> m_read_node_cmds;
 	std::vector<std::shared_ptr<ICommand>> m_delete_node_cmds;
+
+	std::map<std::string, id_type> m_meta_pages;
 
 	friend class Node;
 	friend class Leaf;

@@ -712,6 +712,27 @@ void RTree::DeleteNode(const Node& n)
 	}
 }
 
+void RTree::SetMetaPage(const std::string& key, id_type page)
+{
+	m_meta_pages[key] = page;
+}
+
+id_type RTree::GetMetaPage(const std::string& key) const
+{
+	auto it = m_meta_pages.find(key);
+	return (it != m_meta_pages.end()) ? it->second : NewPage;
+}
+
+bool RTree::HasMetaPage(const std::string& key) const
+{
+	return m_meta_pages.count(key) > 0;
+}
+
+void RTree::RemoveMetaPage(const std::string& key)
+{
+	m_meta_pages.erase(key);
+}
+
 void RTree::InitNew()
 {
 	StoreHeader();
@@ -733,6 +754,13 @@ void RTree::InitOld()
 
 void RTree::StoreHeader()
 {
+	uint32_t meta_sz = sizeof(uint32_t);  // meta_count
+	for (const auto& kv : m_meta_pages) {
+		meta_sz += sizeof(uint32_t);            // key_len
+		meta_sz += (uint32_t)kv.first.size();   // key_data
+		meta_sz += sizeof(id_type);             // page_id
+	}
+
 	const uint32_t header_sz =
 		sizeof(id_type) +						// m_rootID
 		sizeof(RTreeVariant) +					// m_treeVariant
@@ -747,7 +775,8 @@ void RTree::StoreHeader()
 		sizeof(uint32_t) +						// m_stats.m_nodes
 		sizeof(uint64_t) +						// m_stats.m_data
 		sizeof(uint32_t) +						// m_stats.m_treeHeight
-		m_stats.tree_height * sizeof(uint32_t);	// m_stats.m_nodesInLevel
+		m_stats.tree_height * sizeof(uint32_t) +// m_stats.m_nodesInLevel
+		meta_sz;
 
 	uint8_t* header = new uint8_t[header_sz];
 	uint8_t* ptr = header;
@@ -784,6 +813,23 @@ void RTree::StoreHeader()
 	{
 		memcpy(ptr, &(m_stats.nodes_in_level[i]), sizeof(uint32_t));
 		ptr += sizeof(uint32_t);
+	}
+
+	// m_meta_pages
+	uint32_t meta_count = (uint32_t)m_meta_pages.size();
+	memcpy(ptr, &meta_count, sizeof(uint32_t));
+	ptr += sizeof(uint32_t);
+	for (const auto& kv : m_meta_pages)
+	{
+		uint32_t key_len = (uint32_t)kv.first.size();
+		memcpy(ptr, &key_len, sizeof(uint32_t));
+		ptr += sizeof(uint32_t);
+
+		memcpy(ptr, kv.first.data(), key_len);
+		ptr += key_len;
+
+		memcpy(ptr, &kv.second, sizeof(id_type));
+		ptr += sizeof(id_type);
 	}
 
 	m_storage_mgr->StoreByteArray(m_header_id, header_sz, header);
@@ -834,6 +880,32 @@ void RTree::LoadHeader()
 		memcpy(&c, ptr, sizeof(uint32_t));
 		ptr += sizeof(uint32_t);
 		m_stats.nodes_in_level.push_back(c);
+	}
+
+	// m_meta_pages
+	m_meta_pages.clear();
+	uint32_t bytes_read = (uint32_t)(ptr - header);
+	if (bytes_read + sizeof(uint32_t) <= headerSize)
+	{
+		uint32_t meta_count;
+		memcpy(&meta_count, ptr, sizeof(uint32_t));
+		ptr += sizeof(uint32_t);
+
+		for (uint32_t i = 0; i < meta_count; ++i)
+		{
+			uint32_t key_len;
+			memcpy(&key_len, ptr, sizeof(uint32_t));
+			ptr += sizeof(uint32_t);
+
+			std::string key(reinterpret_cast<const char*>(ptr), key_len);
+			ptr += key_len;
+
+			id_type page;
+			memcpy(&page, ptr, sizeof(id_type));
+			ptr += sizeof(id_type);
+
+			m_meta_pages[key] = page;
+		}
 	}
 
 	delete[] header;
