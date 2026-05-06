@@ -4,6 +4,7 @@
 #include "brepdb/typedef.h"
 
 #include <vector>
+#include <memory>
 
 namespace brepdb
 {
@@ -127,6 +128,13 @@ public:
 	virtual ~IQueryStrategy() = default;
 }; // IQueryStrategy
 
+enum class CommandType
+{
+	Write,
+	Read,
+	Delete,
+}; // CommandType
+
 class ISpatialIndex
 {
 public:
@@ -142,7 +150,7 @@ public:
 	virtual void SelfJoinQuery(const IShape& s, IVisitor& v) = 0;
 	virtual void QueryStrategy(IQueryStrategy& qs) = 0;
 	//virtual void GetIndexProperties(PropertySet& out) const = 0;
-	//virtual void AddCommand(ICommand* in, CommandType ct) = 0;
+	virtual void AddCommand(const std::shared_ptr<ICommand>& in, CommandType ct) = 0;
 	virtual bool IsIndexValid() = 0;
 	//virtual void GetStatistics(IStatistics** out) const = 0;
 	virtual void Flush() = 0;

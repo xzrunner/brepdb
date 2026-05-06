@@ -30,7 +30,7 @@ public:
 	virtual void SelfJoinQuery(const IShape& s, IVisitor& v) override;
 	virtual void QueryStrategy(IQueryStrategy& qs) override;
 	//virtual void GetIndexProperties(PropertySet& out) const override;
-	//virtual void AddCommand(ICommand* in, CommandType ct) override;
+	virtual void AddCommand(const std::shared_ptr<ICommand>&, CommandType ct) override;
 	virtual bool IsIndexValid() override;
 	//virtual void GetStatistics(IStatistics** out) const override;
 	virtual void Flush() override;

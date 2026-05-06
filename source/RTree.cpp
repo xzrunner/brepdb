@@ -475,7 +475,22 @@ void RTree::QueryStrategy(IQueryStrategy& qs)
 }
 
 //void GetIndexProperties(PropertySet& out) const;
-//void AddCommand(ICommand* in, CommandType ct);
+
+void RTree::AddCommand(const std::shared_ptr<ICommand>& in, CommandType ct)
+{
+	switch (ct)
+	{
+	case CommandType::Write:
+		m_write_node_cmds.push_back(in);
+		break;
+	case CommandType::Read:
+		m_read_node_cmds.push_back(in);
+		break;
+	case CommandType::Delete:
+		m_delete_node_cmds.push_back(in);
+		break;
+	}
+}
 
 bool RTree::IsIndexValid()
 {
