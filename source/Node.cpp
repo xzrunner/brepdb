@@ -1,5 +1,6 @@
 #include "spatialdb/Node.h"
 #include "spatialdb/Index.h"
+#include <stdexcept>
 #include "spatialdb/RTree.h"
 #include "spatialdb/Exception.h"
 #include "spatialdb/Point.h"
@@ -146,7 +147,7 @@ Node::~Node()
 
 IObject* Node::Clone()
 {
-	throw std::exception("IObject::clone should never be called.");
+	throw std::runtime_error("IObject::clone should never be called.");
 }
 
 uint32_t Node::GetByteArraySize() const
