@@ -66,6 +66,6 @@ set(ALL_FILES
 
 add_library(spatialdb ${ALL_FILES})
 
-target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 target_compile_features(spatialdb PRIVATE cxx_std_17)
